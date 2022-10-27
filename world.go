@@ -58,7 +58,7 @@ func (ew *EntityWorld[ID, I, C]) onEnableComponent(e IEntity[ID, I, C], i I) {
 	newID := oldID
 	oldID.Unset(i)
 	for _, group := range ew.groups {
-		if group.ComponentID.Match(newID.ID) && !group.ComponentID.Match(oldID.ID) {
+		if group.Change(newID, oldID) {
 			group.Add(e)
 		}
 	}
@@ -69,7 +69,7 @@ func (ew *EntityWorld[ID, I, C]) onDisbaleComponent(e IEntity[ID, I, C], i I) {
 	newID := oldID
 	oldID.Set(i)
 	for _, group := range ew.groups {
-		if group.ComponentID.Match(newID.ID) && !group.ComponentID.Match(oldID.ID) {
+		if group.Change(oldID, newID) {
 			group.Remove(e)
 		}
 	}

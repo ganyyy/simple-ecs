@@ -22,6 +22,10 @@ type (
 
 // 函数
 
+type (
+	IEntityCb = ecs.IEntityCb[CompID, CompType, *CompID]
+)
+
 // 辅助函数/结构体
 
 func NewEntityType(name string) *EntityType {

@@ -1,5 +1,7 @@
 package ecs
 
+import "sort"
+
 type IEntityCb[ID any, I comparable, C CID[ID, I]] func(IEntity[ID, I, C]) bool
 
 type EntityGroup[ID any, I comparable, C CID[ID, I]] struct {
@@ -11,6 +13,12 @@ type EntityGroup[ID any, I comparable, C CID[ID, I]] struct {
 	replaceCb []IEntityCb[ID, I, C]
 }
 
+type IdentitySort[T interface{ GetID() IdentityID }] []T
+
+func (a IdentitySort[T]) Len() int           { return len(a) }
+func (a IdentitySort[T]) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a IdentitySort[T]) Less(i, j int) bool { return a[i].GetID() > a[j].GetID() }
+
 func NewEntityGroup[ID any, I comparable, C CID[ID, I]](entities map[IdentityID]IEntity[ID, I, C], idx ...I) *EntityGroup[ID, I, C] {
 	var group EntityGroup[ID, I, C]
 	group.ID = GetComponentID[ID, I, C](idx...)
@@ -18,8 +26,9 @@ func NewEntityGroup[ID any, I comparable, C CID[ID, I]](entities map[IdentityID]
 		if !group.Match(entity.GetComponentID()) {
 			continue
 		}
-		group.entities = append(group.entities, entity)
+		group.Add(entity)
 	}
+	sort.Sort(IdentitySort[IEntity[ID, I, C]](group.entities)) // ?
 	return &group
 }
 
@@ -36,8 +45,8 @@ func (et *EntityGroup[ID, I, C]) OnReplace(cb IEntityCb[ID, I, C]) {
 }
 
 func (et *EntityGroup[ID, I, C]) Foreach(cb IEntityCb[ID, I, C]) {
-	for _, e := range et.entities {
-		if !cb(e) {
+	for i := len(et.entities) - 1; i >= 0; i-- {
+		if !cb(et.entities[i]) {
 			break
 		}
 	}

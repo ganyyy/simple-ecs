@@ -40,9 +40,7 @@ func (e *EntityBase[ID, I, C]) GetComponentID() ID                    { return e
 func (e *EntityBase[ID, I, C]) GetComponent(i I) IComponent[ID, I, C] { return e.components[i] }
 
 func (e *EntityBase[ID, I, C]) AddComponent(c IComponent[ID, I, C]) {
-	if e.components == nil {
-		e.components = make(map[I]IComponent[ID, I, C])
-	}
+	checkMapInit(&e.components)
 	if c.Enable() {
 		e.componentID.Set(c.GetComponentId())
 	}

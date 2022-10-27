@@ -43,4 +43,7 @@ type ComponentID[ID any, I comparable, C CID[ID, I]] struct{ ID ID }
 func (c *ComponentID[ID, I, C]) Set(idx ...I)     { C(&c.ID).Set(idx...) }
 func (c *ComponentID[ID, I, C]) Unset(idx ...I)   { C(&c.ID).Unset(idx...) }
 func (c *ComponentID[ID, I, C]) Less(id ID) bool  { return C(&c.ID).Less(id) }
-func (c *ComponentID[ID, I, C]) Match(id ID) bool { return C(&c.ID).Match(id) }
+func (c *ComponentID[ID, I, C]) Match(id ID) bool { return C(&c.ID).Match(id) } // c是较小的, id是较大的
+func (c *ComponentID[ID, I, C]) Change(big, small ComponentID[ID, I, C]) bool {
+	return c.Match(big.ID) && !c.Match(small.ID)
+}
